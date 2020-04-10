@@ -1,0 +1,29 @@
+@import './_grid.scss';
+@import './_reset.scss';
+@import './_containers.scss';
+@import './_variables.scss';
+
+body {
+  min-height: 100%;
+  background-color: $body-bg;
+  font-family: Helvetica, Arial sans-serif;
+}
+textarea {
+  font-family: Helvetica, Arial sans-serif;
+}
+
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: $white-bg;
+  min-height: calc(-200px + 100vh);
+  border-radius: 10px;
+  border-right: solid 1px $border-light;
+  border-bottom: solid 1px $border-light;
+  margin: 20px 20px 20px;
+  padding: 30px 10px;
+  @include media-breakpoint-up(sm) {
+  padding: 50px 40px;
+  }
+}

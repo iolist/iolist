@@ -1,0 +1,50 @@
+/* ==========================================================================
+
+// Base Containers - http://getbase.org
+// Author: Matthew Hartman - http://www.matthewhartman.com.au/
+// Version: 4.2.1 - Last Updated: October 15, 2019
+
+========================================================================== */
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+.container, .container-full {
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-left: auto;
+  margin-right: auto; }
+
+@media only screen and (min-width: 768px) {
+  .container-m, .container-full-m {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto; }
+  .container, .container-m {
+    width: 738px; }
+  .container-full-m {
+    width: auto; } }
+
+@media only screen and (min-width: 980px) {
+  .container-l, .container-full-l {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto; }
+  .container, .container-l {
+    width: 950px; }
+  .container-full-l {
+    width: auto; } }
+
+@media only screen and (min-width: 1200px) {
+  .container-xl, .container-full-xl {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-left: auto;
+    margin-right: auto; }
+  .container, .container-xl {
+    width: 1170px; }
+  .container-full-xl {
+    width: auto; } }

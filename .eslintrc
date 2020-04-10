@@ -9,6 +9,9 @@
     "no-console": "off",
     "comma-dangle": "off",
     "react/jsx-filename-extension": "off",
-    "no-trailing-spaces": ["error"]
+    "no-trailing-spaces": ["error"],
+    "func-names": "off",
+    "import/no-named-as-default": "off",
+    "import/no-dynamic-require": "off"
   }
 }

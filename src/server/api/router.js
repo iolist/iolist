@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const listController = require('./controllers/list.controller.js');
@@ -19,7 +20,7 @@ router.put('/node/:id', nodeController.editNode);
 router.delete('/node/:id', nodeController.deleteNode);
 
 router.use('*', (req, res) => {
-  res.status(404).send({message: 'API not found'});
+  res.status(404).send({ message: 'API not found' });
 });
 
 module.exports = router;
