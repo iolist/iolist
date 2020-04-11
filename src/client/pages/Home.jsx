@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { Loader } from '../components/Loader';
 import { fetchLists } from '../store/actions/lists';
 
 // Styles
@@ -15,12 +16,15 @@ export class Home extends Component {
 
   render() {
     const { lists } = this.props;
+    if (lists.isFetching) {
+      return <Loader />;
+    }
     return (
       <Fragment>
-        <h1>This is Home page</h1>
+        <h1 className={styles.header}>This is Home page</h1>
         <div className="row">
           {lists.value && lists.value.map(item => (
-            <Link className={`col-12 col-6-m ${styles.list}`} to={`/list/${item.id}`}>
+            <Link className={`col-12 col-6-m ${styles.list}`} to={`/list/${item.id}`} key={item.id}>
               {item.name}
             </Link>
           ))}

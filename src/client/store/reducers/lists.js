@@ -1,6 +1,6 @@
 import { FETCH_LISTS_REQUEST, FETCH_LISTS_SUCCESS, FETCH_LISTS_FAILURE } from '../actions/lists';
 
-export const initialState = { isFetching: true, error: null, value: null };
+const initialState = { isFetching: true, error: null, value: null };
 
 const lists = (state = initialState, { type, payload }) => {
   switch (type) {

@@ -1,16 +1,19 @@
-import React, { Component } from 'react';
+import React, { Fragment } from 'react';
 import Router from './Router';
+import Header from './components/Header';
 
 import './styles/app.global.scss';
 
-export default class App extends Component {
-  render() {
-    return (
-      <div className="container-l">
-        <div className="page">
-          <Router />
-        </div>
+export const App = () => (
+  <Fragment>
+    <Header />
+    <div className="container-l">
+      <div className="page">
+        <Router />
       </div>
-    );
-  }
-}
+    </div>
+  </Fragment>
+
+);
+
+export default App;

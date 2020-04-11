@@ -1,6 +1,6 @@
 {
   "name": "iolist",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Boilerplate to build a full stack web application using React, Node.js, Express and Webpack.",
   "main": "src/server/index.js",
   "scripts": {

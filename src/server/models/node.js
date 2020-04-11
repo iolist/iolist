@@ -1,4 +1,3 @@
-'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Node = sequelize.define('Node', {
     parent_id: {
@@ -34,9 +33,9 @@ module.exports = (sequelize, DataTypes) => {
       }
     ]
   });
-  Node.associate = function(models) {
+  Node.associate = function (models) {
     // associations can be defined here
-    Node.belongsTo(models.List, {foreignKey: 'list_id', unique: false});
+    Node.belongsTo(models.List, { foreignKey: 'list_id', unique: false });
   };
 
   return Node;
