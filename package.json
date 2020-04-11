@@ -6,9 +6,9 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "npm run build && node src/server/index.js",
-    "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
+    "client": "webpack-dev-server --mode development --devtool inline-source-map",
     "server": "nodemon src/server/index.js",
-    "dev": "nodemon src/server/index.js & webpack-dev-server --mode development --devtool inline-source-map --hot"
+    "dev": "nodemon src/server/index.js & webpack-dev-server --mode development --devtool inline-source-map"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",

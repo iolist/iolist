@@ -8,6 +8,7 @@ module.exports = (env, argv) => ({
   entry: ['./src/client/index.js'],
   output: {
     path: path.join(__dirname, outputDirectory),
+    publicPath: '/',
     filename: 'bundle.[hash].js'
   },
   module: {
@@ -76,6 +77,8 @@ module.exports = (env, argv) => ({
   devServer: {
     port: 3000,
     open: false,
+    overlay: true,
+    hot: true,
     historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:8080'
@@ -84,6 +87,7 @@ module.exports = (env, argv) => ({
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
+      baseUrl: '/',
       template: './public/index.html',
       favicon: './public/favicon.ico'
     })

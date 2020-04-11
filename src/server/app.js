@@ -1,6 +1,7 @@
 const express = require('express');
 const createError = require('http-errors');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const api = require('./api/router.js');
 
@@ -16,22 +17,22 @@ app.disable('x-powered-by');
 
 app.use('/api', api);
 
-// router.get('*', (req, res) => {
-//   res.sendFile(path.resolve('server/public/main.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve('dist/index.html'));
+});
+
+// // catch 404 and forward to error handler
+// app.use((req, res, next) => {
+//   next(createError(404));
 // });
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  next(createError(404));
-});
-
-// error handler
-app.use((err, req, res) => {
-  console.log('AAAAAAAAAAAA');
-  const error = app.get('env') === 'development' ? err : {};
-  // render the error page
-  res.status(err.status || 500);
-  res.json({ status: err.status || 500, ...error });
-});
+// // error handler
+// app.use((err, req, res) => {
+//   console.log('AAAAAAAAAAAA');
+//   const error = app.get('env') === 'development' ? err : {};
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.json({ status: err.status || 500, ...error });
+// });
 
 module.exports = app;
