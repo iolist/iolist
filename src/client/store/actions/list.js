@@ -1,6 +1,6 @@
 import generateActions from '../../utils/store';
 import requestEndpoint from '../../utils/remote';
-import showError from './errors';
+import { showError } from './errors';
 
 export const FETCH_LIST_REQUEST = 'FETCH_LIST_REQUEST';
 export const FETCH_LIST_SUCCESS = 'FETCH_LIST_SUCCESS';

@@ -22,7 +22,7 @@ export class List extends Component {
       <Fragment>
         <h1>{list.info.name}</h1>
         {parents.map(node => (
-          <Node node={node} />
+          <Node node={node} key={node.id} />
         ))}
       </Fragment>
     );
