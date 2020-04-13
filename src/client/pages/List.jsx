@@ -7,6 +7,8 @@ import Node from '../components/Node';
 import { fetchList } from '../store/actions/list';
 import { getChildNodes } from '../utils/tree';
 
+import styles from './List.scss';
+
 export class List extends Component {
   componentDidMount() {
     const { dispatch, match } = this.props;
@@ -20,7 +22,7 @@ export class List extends Component {
     }
     return (
       <Fragment>
-        <h1>{list.info.name}</h1>
+        <h1 className={styles.listHeader}>{list.info.name}</h1>
         {parents.map(node => (
           <Node node={node} key={node.id} />
         ))}

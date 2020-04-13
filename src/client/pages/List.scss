@@ -1,0 +1,10 @@
+@import 'src/client/styles/_variables.scss';
+
+.listHeader {
+  @include media-breakpoint-up(sm) {
+   text-align: left;
+ }
+ text-align: center;
+ margin-bottom: 10px;
+ font-size: 20px;
+}
