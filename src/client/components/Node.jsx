@@ -81,13 +81,19 @@ export class Node extends Component {
               </div>
             </div>
 
-            <textarea className={styles.title} ref={this.textarea} onChange={this.changeTitle} defaultValue={node.title} rows="1" />
+            <textarea
+              className={styles.title}
+              ref={this.textarea}
+              onChange={this.changeTitle}
+              defaultValue={node.title}
+              rows="1"
+            />
           </div>
 
           {!collapsed && (
             <div className={styles.children}>
               {children && children.map(child => (
-                <Node node={child} key={child.id} />
+                child && <ConnectedNode node={child} key={child.id} />
               ))}
             </div>
           )}
@@ -97,11 +103,9 @@ export class Node extends Component {
   }
 }
 
-const mapStateToProps = ({ list }, ownProps) => {
-  const { node } = ownProps;
-  return {
-    children: getChildNodes(list.nodes, node.id)
-  };
-};
+const mapStateToProps = ({ list }, ownProps) => ({
+  children: getChildNodes(list.nodes, ownProps.node.id)
+});
 
-export default connect(mapStateToProps)(Node);
+const ConnectedNode = connect(mapStateToProps)(Node);
+export default ConnectedNode;
