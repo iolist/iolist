@@ -1,0 +1,18 @@
+@import 'src/client/styles/_variables.scss';
+.header {
+  color: $text-black;
+  margin-bottom: 30px;
+}
+.list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  border-radius: 10px;
+  background: $body-bg;
+  text-decoration: none;
+  color: $text-black;
+  &:hover {
+    background: $light-grey-bg;
+  }
+}

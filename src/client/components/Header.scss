@@ -1,0 +1,20 @@
+@import 'src/client/styles/_variables.scss';
+
+.headerContent {
+  min-height: 60px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  height: 100%;
+}
+.headerLink {
+  color: $text-grey;
+  text-decoration: none;
+  display: block;
+  &:hover  {
+      color: $text-black;
+    }
+}

@@ -1,0 +1,42 @@
+$text-black: #2a3534;
+$text-grey: #acacac;
+
+$white-bg: #fafafa;
+$body-bg: #ececec;
+$light-grey-bg: #d8d8d8;
+$hover-bg: #ececec;
+$border-light: #dfdede;
+$border-grey: #acacac;
+
+$error-bg: #fef0f0;
+$error-color: #f56c6c;
+
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+);
+
+@mixin media-breakpoint-up($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media screen and (min-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
+
+@mixin media-breakpoint-down($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    $breakpoint-value: map-get($breakpoints, $breakpoint);
+    @media screen and (max-width: $breakpoint-value) {
+      @content;
+    }
+  } @else {
+    @warn 'Invalid breakpoint: #{$breakpoint}.';
+  }
+}
