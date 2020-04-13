@@ -32,23 +32,32 @@ export function fetchList(id) {
  * Add new node with temp_id -> send request to server -> get the id and update the node
  * @param {Object} newData
  */
-export function addNode(newData) {
-  const tempId = `${Date.now()}_t`;
+export function addEmptyNode(tempId, newData) {
+  return {
+    type: ADD_NEW_NODE,
+    payload: { id: tempId, temp: true, ...newData }
+  };
+}
+
+/**
+ * Adding new node (without id)
+ * Add new node with temp_id -> send request to server -> get the id and update the node
+ * @param {Object} newData
+ */
+export function addNode(tempId, newData) {
   return async (dispatch) => {
-    dispatch({
-      type: ADD_NEW_NODE,
-      payload: { temp_id: tempId, ...newData }
-    });
+    dispatch(addEmptyNode(tempId, newData));
     const result = await requestEndpoint('/api/node', { method: 'POST', body: JSON.stringify(newData) });
     if (result.error) {
-      dispatch(showError(result.error));
-    } else {
-      dispatch({
-        type: UPDATE_NODE,
-        tempId,
-        payload: result.data
-      });
+      return Promise.resolve(dispatch(showError(result.error)));
     }
+    Promise.resolve(dispatch({
+      type: UPDATE_NODE,
+      id: tempId,
+      temp: true,
+      payload: result.data
+    }));
+    return Promise.resolve();
   };
 }
 
@@ -57,20 +66,32 @@ export function addNode(newData) {
  * @param {String|Number} id
  * @param {Object} updateData
  */
-export const updateNode = (id, updateData) => ({
-  type: UPDATE_NODE,
-  id,
-  payload: updateData
-});
+export const updateNode = (id, updateData) => async (dispatch) => {
+  const result = await requestEndpoint(`/api/node/${id}`, { method: 'PUT', body: JSON.stringify(updateData) });
+  if (result.error) {
+    return Promise.resolve(dispatch(showError(result.error)));
+  }
+  return Promise.resolve(dispatch({
+    type: UPDATE_NODE,
+    id,
+    payload: updateData
+  }));
+};
 
 /**
  * Delete node by id
  * @param {String|Number} id
  */
-export const deleteNode = id => ({
-  type: DELETE_NODE,
-  id,
-});
+export const deleteNode = id => async (dispatch) => {
+  const result = await requestEndpoint(`/api/node/${id}`, { method: 'DELETE' });
+  if (result.error) {
+    return Promise.resolve(dispatch(showError(result.error)));
+  }
+  return Promise.resolve(dispatch({
+    type: DELETE_NODE,
+    id
+  }));
+};
 
 /**
  * Delete node by tempId
@@ -78,5 +99,5 @@ export const deleteNode = id => ({
  */
 export const deleteTempNode = tempId => ({
   type: DELETE_NODE,
-  tempId,
+  tempId
 });

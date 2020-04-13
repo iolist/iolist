@@ -37,6 +37,10 @@ class Dropdown extends React.Component {
     });
   }
 
+  componentWillUnmount = () => {
+    document.removeEventListener('click', this.hideDropdownMenu);
+  }
+
   render() {
     const { trigger, options } = this.props;
     const { displayMenu } = this.state;
@@ -56,7 +60,7 @@ class Dropdown extends React.Component {
           <div className={styles.dropdownMenu} style={{ top: triggerHeight + MENU_MARGIN }}>
             {options.map((option, key) => (
               <div className={styles.dropdownItem} style={option.width ? { width: option.width } : {}} key={option.id || key}>
-                <a className={styles.dropdownLink} href={option.href} onClick={option.callback}>{option.text}</a>
+                <a className={styles.dropdownLink} href={option.href} onClick={() => { this.hideDropdownMenu(); option.callback(); }}>{option.text}</a>
               </div>
             ))}
           </div>

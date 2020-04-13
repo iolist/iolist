@@ -63,6 +63,12 @@
     cursor: pointer;
     width: 24px;
     border-radius: 12px;
+    .unsynced {
+      fill: $unsynced;
+    }
+    .lost {
+      fill: $error-color
+    }
     &:hover {
       background: $hover-bg;
       .bullet, .caret {

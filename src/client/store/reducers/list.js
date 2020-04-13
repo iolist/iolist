@@ -7,7 +7,7 @@ const initialState = {
 };
 
 const nodes = (state = initialState, {
-  type, id, tempId, payload
+  type, id, temp, payload
 }) => {
   switch (type) {
     // whole list:
@@ -34,25 +34,26 @@ const nodes = (state = initialState, {
     case ADD_NEW_NODE:
       return {
         ...state,
-        nodes: [...nodes, payload]
+        nodes: [...state.nodes, payload]
       };
     case UPDATE_NODE: {
-      const comparator = tempId ? node => node.temp_id === tempId : node => node.id === id;
       return {
         ...state,
         nodes: state.nodes.map((node) => {
-          if (comparator(node)) {
-            return { ...node, payload };
+          if (node.id === id) {
+            if (temp) {
+              return { ...node, ...payload, temp: false };
+            }
+            return { ...node, ...payload };
           }
           return node;
         })
       };
     }
     case DELETE_NODE: {
-      const comparator = tempId ? node => node.temp_id !== tempId : node => node.id !== id;
       return {
         ...state,
-        nodes: state.nodes.filter(comparator)
+        nodes: state.nodes.filter(node => node.id !== id)
       };
     }
     default:
