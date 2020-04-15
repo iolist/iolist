@@ -10,6 +10,14 @@ export function setCaretPositionToEnd(element) {
   element.setSelectionRange(element.value.length, element.value.length);
 }
 
+export function setCaretPositionTo(element, position) {
+  if (!element || position < 0 || position > element.value.length) {
+    return;
+  }
+  element.focus();
+  element.setSelectionRange(position, position);
+}
+
 export function setCaretPositionToBegin(element) {
   if (!element) {
     return;

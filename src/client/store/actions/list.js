@@ -8,6 +8,7 @@ export const FETCH_LIST_FAILURE = 'FETCH_LIST_FAILURE';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const UPDATE_NODE = 'UPDATE_NODE';
 export const DELETE_NODE = 'DELETE_NODE';
+export const TOGGLE_NODE_CHILDREN = 'TOGGLE_NODE_CHILDREN';
 
 const { fetchSuccess, fetchFailure, request } = generateActions({
   request: FETCH_LIST_REQUEST,
@@ -40,6 +41,17 @@ export function addEmptyNode(tempId, newData) {
 }
 
 /**
+ * Show/Hide node children
+ * @param {*} id ID of node
+ */
+export function toggleNodeChilden(id) {
+  return {
+    type: TOGGLE_NODE_CHILDREN,
+    id
+  };
+}
+
+/**
  * Adding new node (without id)
  * Add new node with temp_id -> send request to server -> get the id and update the node
  * @param {Object} newData
@@ -67,15 +79,16 @@ export function addNode(tempId, newData) {
  * @param {Object} updateData
  */
 export const updateNode = (id, updateData) => async (dispatch) => {
+  dispatch({
+    type: UPDATE_NODE,
+    id,
+    payload: updateData
+  });
   const result = await requestEndpoint(`/api/node/${id}`, { method: 'PUT', body: JSON.stringify(updateData) });
   if (result.error) {
     return Promise.resolve(dispatch(showError(result.error)));
   }
-  return Promise.resolve(dispatch({
-    type: UPDATE_NODE,
-    id,
-    payload: updateData
-  }));
+  return Promise.resolve();
 };
 
 /**

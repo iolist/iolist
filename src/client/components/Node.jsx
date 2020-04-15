@@ -6,10 +6,14 @@ import Loader from './Loader';
 import Icon from './Icon';
 import Dropdown from './Dropdown';
 
-import { addNode, deleteNode, updateNode } from '../store/actions/list';
+import {
+  addNode, deleteNode, updateNode, toggleNodeChilden
+} from '../store/actions/list';
 
 import { getChildNodes } from '../utils/tree';
-import { isCaretPositionAt, setCaretPositionToEnd, setCaretPositionToBegin } from '../utils/text';
+import {
+  isCaretPositionAt, setCaretPositionToEnd, setCaretPositionTo, setCaretPositionToBegin
+} from '../utils/text';
 
 import ellipsis from '../assets/icons/ellipsis-vertical.svg';
 import ellipse from '../assets/icons/ellipse.svg';
@@ -27,7 +31,6 @@ export class Node extends Component {
     this.syncTimeout = null;
 
     this.state = {
-      collapsed: false,
       title: '',
       changed: false
     };
@@ -36,6 +39,19 @@ export class Node extends Component {
   componentDidMount() {
     const { node } = this.props;
     this.setState({ title: node.title });
+  }
+
+  componentDidUpdate(prevProps) {
+    const { node: prevNode } = prevProps;
+    const { node } = this.props;
+    const { title } = this.state;
+    if (!prevNode) {
+      return;
+    }
+    if (node.title !== prevNode.title && node.title !== title) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ title: node.title }); // update title if it comes from store
+    }
   }
 
   getPreviousNode = () => {
@@ -62,9 +78,10 @@ export class Node extends Component {
     return null;
   }
 
-  handleKeydown = (e) => {
-    const { node } = this.props;
+  handleKeydown = async (e) => {
+    const { node, allNodes, dispatch } = this.props;
     const { title } = this.state;
+    console.log(e.key, e.shiftKey);
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowUp':
@@ -86,17 +103,38 @@ export class Node extends Component {
         if (isCaretPositionAt(e.target, 0)) {
           e.preventDefault();
           if (node.previous_id) {
+            if (title) {
+              const prevNode = allNodes.find(n => n.id === node.previous_id);
+              await dispatch(updateNode(node.previous_id, { title: prevNode.title + title }));
+            }
             setCaretPositionToEnd(this.getPreviousNode());
+            this.deleteThisNode();
           }
         }
         break;
-      case 'Enter':
+      case 'Enter': {
         e.preventDefault();
-        if (!node.id) {
+        if (node.temp) {
           return;
         }
-        setCaretPositionToBegin(this.getNextNode());
+        const newTitle = title.slice(0, this.textarea.current.selectionStart);
+        const newNodeTitle = title.slice(this.textarea.current.selectionEnd, title.length);
+        dispatch(updateNode(node.id, { title: newTitle }));
+        this.addNewNode(newNodeTitle);
         break;
+      }
+
+      case 'Tab': {
+        e.preventDefault();
+        if (e.shiftKey) {
+          this.unIndentNode();
+        } else {
+          this.indentNode();
+        }
+        break;
+      }
+
+
       default:
         return;
     }
@@ -111,11 +149,12 @@ export class Node extends Component {
       title,
       previous_id: node.id
     }));
-    setCaretPositionToBegin(this.getNextNode());
+    setCaretPositionTo(this.getNextNode(), title.length);
   }
 
   deleteThisNode = () => {
     const { dispatch, node } = this.props;
+    clearTimeout(this.syncTimeout);
     dispatch(deleteNode(node.id));
   }
 
@@ -137,6 +176,47 @@ export class Node extends Component {
     }, TIME_TO_UPDATE);
   }
 
+  indentNode = async () => {
+    const { dispatch, node, allNodes } = this.props;
+    if (node.previous_id) {
+      const nextNode = allNodes.find(n => n.previous_id === node.id);
+      const parentNodeChildren = getChildNodes(allNodes, node.previous_id);
+      await dispatch(updateNode(node.id, {
+        parent_id: node.previous_id,
+        previous_id: parentNodeChildren.length ? parentNodeChildren[parentNodeChildren.length - 1].id : null // if parent has children - use last one as previous
+      }));
+      if (nextNode) {
+        // update next node in order not to lose link on previous
+        dispatch(updateNode(nextNode.id, { previous_id: node.previous_id }));
+      }
+    }
+  }
+
+  unIndentNode = async () => {
+    const { dispatch, node, allNodes } = this.props;
+    if (node.parent_id) {
+      const nextParentNode = allNodes.find(n => n.previous_id === node.parent_id);
+      const parentNode = allNodes.find(n => n.id === node.parent_id);
+      const nextNode = allNodes.find(n => n.previous_id === node.id);
+      if (parentNode) {
+        await dispatch(updateNode(node.id, { parent_id: parentNode.parent_id, previous_id: node.parent_id }));
+        if (nextNode) {
+          // update next node in order not to lose link on previous
+          dispatch(updateNode(nextNode.id, { previous_id: node.previous_id }));
+        }
+        if (nextParentNode) {
+          // update next parent node id to link on this node
+          dispatch(updateNode(nextParentNode.id, { previous_id: node.id }));
+        }
+      }
+    }
+  }
+
+  toggleChilden = () => {
+    const { dispatch, node } = this.props;
+    dispatch(toggleNodeChilden(node.id));
+  }
+
   calculateSizeOfTextarea = () => {
     if (this.textarea.current) {
       this.textarea.current.style.height = 'auto';
@@ -145,8 +225,8 @@ export class Node extends Component {
   }
 
   render() {
-    const { node, children } = this.props;
-    const { collapsed, title, changed } = this.state;
+    const { node, children, collapsed } = this.props;
+    const { title, changed } = this.state;
     const indicatorClass = `${changed ? styles.unsynced : ''} ${node.lost ? styles.lost : ''}`;
     if (!node) return null;
     return (
@@ -161,7 +241,9 @@ export class Node extends Component {
                       trigger={<Icon customClass={styles.icon} icon={ellipsis} />}
                       options={[
                         { text: 'Delete', callback: () => this.deleteThisNode() },
-                        { text: 'Add node', callback: () => this.addNewNode() }
+                        { text: 'Add node', callback: () => this.addNewNode() },
+                        { text: 'Indent', callback: () => this.indentNode() },
+                        { text: 'UnIndent', callback: () => this.unIndentNode() }
                       ]}
                     />
                   )
@@ -169,7 +251,7 @@ export class Node extends Component {
                   }
               </div>
 
-              <div className={styles.point} onClick={() => this.setState(state => ({ collapsed: !state.collapsed }))}>
+              <div className={styles.point} onClick={this.toggleChilden}>
                 {children && children.length ? (
                   <div className={`${styles.caret} ${collapsed ? styles.collapsed : ''}`}>
                     <Icon icon={caret} customClass={indicatorClass} />
@@ -206,6 +288,8 @@ export class Node extends Component {
 
 const mapStateToProps = ({ list }, ownProps) => ({
   children: getChildNodes(list.nodes, ownProps.node.id),
+  allNodes: list.nodes,
+  collapsed: list.collapsed.indexOf(ownProps.node.id) !== -1
 });
 
 const ConnectedNode = connect(mapStateToProps)(Node);
