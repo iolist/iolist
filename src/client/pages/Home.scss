@@ -12,7 +12,30 @@
   background: $body-bg;
   text-decoration: none;
   color: $text-black;
+  margin-bottom: 10px;
   &:hover {
     background: $light-grey-bg;
+  }
+}
+
+.addButton {
+  display: flex;
+  justify-content: center;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  border-radius: 10px;
+  border: none;
+  background: none;
+  color: $text-black;
+  cursor: pointer;
+  width: 100%;
+  &:hover {
+    background: $body-bg;
+  }
+  .icon {
+    height: 40px;
+    width: 40px;
+
   }
 }

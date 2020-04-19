@@ -53,10 +53,9 @@ module.exports.getListContent = function (req, res) {
 };
 
 module.exports.deleteList = function (req, res) {
-  List.findByPk(req.params.id).then((node) => {
-    console.log(node);
-    if (node) {
-      node.destroy().then(() => {
+  List.findByPk(req.params.id).then((list) => {
+    if (list) {
+      list.destroy().then(() => {
         res.json({ deleted_id: req.params.id, success: true });
       }, (error) => {
         res.status(500).send(error);
@@ -64,6 +63,21 @@ module.exports.deleteList = function (req, res) {
     }
   }, (error) => {
     console.error(error);
+    res.status(500).send(error);
+  });
+};
+
+module.exports.editList = function (req, res) {
+  List.findByPk(req.params.id).then((list) => {
+    if (list) {
+      list.update({ ...req.body }).then(() => {
+        res.json({ id: list.id });
+      }, (error) => {
+        console.error(error);
+        res.status(500).send(error);
+      });
+    }
+  }, (error) => {
     res.status(500).send(error);
   });
 };

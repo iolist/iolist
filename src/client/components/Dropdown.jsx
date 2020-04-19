@@ -1,14 +1,14 @@
 import React from 'react';
 
-import styles from './Dropdown.scss';
+import Icon from './Icon';
 
 import trash from '../assets/icons/trash.svg';
 import add from '../assets/icons/add.svg';
 import caret from '../assets/icons/caret.svg';
 import caretBack from '../assets/icons/caret-back.svg';
-import chevronUp from '../assets/icons/chevron-down.svg';
-import chevronDown from '../assets/icons/chevron-up.svg';
-import Icon from './Icon';
+import chevronUp from '../assets/icons/chevron-up.svg';
+import chevronDown from '../assets/icons/chevron-down.svg';
+import styles from './Dropdown.scss';
 
 const MENU_MARGIN = 5;
 
@@ -27,23 +27,30 @@ class Dropdown extends React.Component {
 
   showDropdownMenu = (event) => {
     event.preventDefault();
+    const { onOpen } = this.props;
+    if (onOpen) {
+      onOpen();
+    }
     this.setState({ displayMenu: true }, () => {
       document.addEventListener('click', this.hideDropdownMenu);
     });
   }
 
-  setStyle = () => {
-    // const { displayMenu } = this.state;
-    // if (!displayMenu) return;
-
-    // const contentRect = contentElem.getBoundingClientRect();
-    // const triggerRect = this.triggerElement.getBoundingClientRect();
-    // if (window.innerHeight < contentRect.height) { return position = 'top'; }
-    // if (window.innerHeight - triggerRect.y - triggerRect.height < contentRect.height) { return position = 'bottom'; }
-    // return position = 'top';
-  }
+  // setStyle = () => {
+  //   const { displayMenu } = this.state;
+  //   if (!displayMenu) return;
+  //   const contentRect = contentElem.getBoundingClientRect();
+  //   const triggerRect = this.triggerElement.getBoundingClientRect();
+  //   if (window.innerHeight < contentRect.height) { return position = 'top'; }
+  //   if (window.innerHeight - triggerRect.y - triggerRect.height < contentRect.height) { return position = 'bottom'; }
+  //   return position = 'top';
+  // }
 
   hideDropdownMenu = () => {
+    const { onClose } = this.props;
+    if (onClose) {
+      onClose();
+    }
     this.setState({ displayMenu: false }, () => {
       document.removeEventListener('click', this.hideDropdownMenu);
     });
@@ -79,7 +86,7 @@ class Dropdown extends React.Component {
     const { trigger, options } = this.props;
     const { displayMenu } = this.state;
     const triggerHeight = this.triggerElement.current ? this.triggerElement.current.getBoundingClientRect().height : 0;
-
+    console.log(this.whichIcon(options[0]));
     return (
       <div className={styles.dropdown}>
         <div
@@ -93,8 +100,16 @@ class Dropdown extends React.Component {
         { displayMenu && (
           <div className={styles.dropdownMenu} style={{ top: triggerHeight + MENU_MARGIN }}>
             {options.map((option, key) => (
-              <div className={`${styles.dropdownItem} ${option.disabled ? styles.disabledItem : ''}`} style={option.width ? { width: option.width } : {}} key={option.id || key}>
-                <a className={`${styles.dropdownLink} ${option.type ? styles[option.type] : ''}`} href={option.href} onClick={() => this.activateCallback(option)}>
+              <div
+                className={`${styles.dropdownItem} ${option.disabled ? styles.disabledItem : ''}`}
+                style={option.width ? { width: option.width } : {}}
+                key={option.id || key}
+              >
+                <a
+                  className={`${styles.dropdownLink} ${option.type ? styles[option.type] : ''}`}
+                  href={option.href}
+                  onClick={() => this.activateCallback(option)}
+                >
                   <Icon customClass={styles.dropdownIcon} icon={this.whichIcon(option)} />
                   <span className={styles.dropdownText}>{option.text}</span>
                   {option.combination && <span className={styles.dropdownCombination}>{option.combination}</span>}

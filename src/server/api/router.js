@@ -11,6 +11,8 @@ router.post('/list', listController.createList);
 
 router.get('/list/:id', listController.getListContent);
 
+router.put('/list/:id', listController.editList);
+
 router.delete('/list/:id', listController.deleteList);
 
 router.post('/node', nodeController.createNode);
