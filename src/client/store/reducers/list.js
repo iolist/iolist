@@ -1,5 +1,6 @@
 import {
-  FETCH_LIST_REQUEST, FETCH_LIST_SUCCESS, FETCH_LIST_FAILURE, ADD_NEW_NODE, UPDATE_NODE, DELETE_NODE, TOGGLE_NODE_CHILDREN
+  FETCH_LIST_REQUEST, FETCH_LIST_SUCCESS, FETCH_LIST_FAILURE,
+  ADD_NEW_NODE, UPDATE_NODE, DELETE_NODE, TOGGLE_NODE_CHILDREN, UPDATE_INFO
 } from '../actions/list';
 
 const initialState = {
@@ -78,6 +79,12 @@ const nodes = (state = initialState, {
         nodes: updatedNodes.filter(node => node.id !== id) // remove node from list with moved previous id
       };
     }
+
+    case UPDATE_INFO:
+      return {
+        ...state,
+        info: { ...state.info, ...payload }
+      };
 
     case TOGGLE_NODE_CHILDREN: {
       let collapsedItems = state.collapsed;

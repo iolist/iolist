@@ -2,12 +2,32 @@
 
 .listHeader {
   @include media-breakpoint-up(sm) {
-   text-align: left;
-   margin-bottom: 30px;
- }
- text-align: center;
- margin-bottom: 10px;
- font-size: 20px;
+    text-align: left;
+    margin-bottom: 30px;
+  }
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 20px;
+  display: block;
+  min-height: 22px;
+  outline: none;
+  border: none;
+  background: none;
+  resize: none;
+  height: auto;
+  width: 100%;
+}
+
+.listMenu {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+  .icon {
+    height: 20px;
+    width: 20px;
+    display: block;
+  }
 }
 
 .listAddNode {

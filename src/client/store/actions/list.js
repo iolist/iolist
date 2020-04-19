@@ -5,6 +5,7 @@ import { showError } from './errors';
 export const FETCH_LIST_REQUEST = 'FETCH_LIST_REQUEST';
 export const FETCH_LIST_SUCCESS = 'FETCH_LIST_SUCCESS';
 export const FETCH_LIST_FAILURE = 'FETCH_LIST_FAILURE';
+export const UPDATE_INFO = 'UPDATE_INFO';
 export const ADD_NEW_NODE = 'ADD_NEW_NODE';
 export const UPDATE_NODE = 'UPDATE_NODE';
 export const DELETE_NODE = 'DELETE_NODE';
@@ -21,10 +22,9 @@ export function fetchList(id) {
     dispatch(request());
     const result = await requestEndpoint(`/api/list/${id}`);
     if (result.error) {
-      dispatch(fetchFailure(result.error));
-    } else {
-      dispatch(fetchSuccess(result.data));
+      return Promise.resolve(dispatch(fetchFailure(result.error)));
     }
+    return Promise.resolve(dispatch(fetchSuccess(result.data)));
   };
 }
 
@@ -72,15 +72,32 @@ export function addNode(tempId, newData) {
     if (result.error) {
       return Promise.resolve(dispatch(showError(result.error)));
     }
-    Promise.resolve(dispatch({
+    return Promise.resolve(dispatch({
       type: UPDATE_NODE,
       id: tempId,
       temp: true,
       payload: result.data
     }));
-    return Promise.resolve();
   };
 }
+
+/**
+ * Update list by id
+ * @param {String|Number} id
+ * @param {Object} updateData
+ */
+export const updateInfo = updateData => async (dispatch, getState) => {
+  dispatch({
+    type: UPDATE_INFO,
+    payload: updateData
+  });
+  const { list: { info } } = getState();
+  const result = await requestEndpoint(`/api/list/${info.id}`, { method: 'PUT', body: JSON.stringify(updateData) });
+  if (result.error) {
+    return Promise.resolve(dispatch(showError(result.error)));
+  }
+  return Promise.resolve();
+};
 
 /**
  * Update node by id

@@ -58,6 +58,7 @@ export class Node extends Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this.syncTimeout);
     window.removeEventListener('resize', this.calculateSizeOfTextarea);
   }
 
@@ -178,8 +179,14 @@ export class Node extends Component {
   }
 
   deleteThisNode = () => {
-    const { dispatch, node } = this.props;
+    const { dispatch, node, allNodes } = this.props;
     clearTimeout(this.syncTimeout);
+    if (node.previous_id) {
+      const nextNode = allNodes.find(n => n.previous_id === node.id);
+      if (nextNode) {
+        dispatch(updateNode(nextNode.id, { previous_id: node.previous_id }));
+      }
+    }
     dispatch(deleteNode(node.id));
   }
 
@@ -208,7 +215,8 @@ export class Node extends Component {
       const parentNodeChildren = getChildNodes(allNodes, node.previous_id);
       await dispatch(updateNode(node.id, {
         parent_id: node.previous_id,
-        previous_id: parentNodeChildren.length ? parentNodeChildren[parentNodeChildren.length - 1].id : null // if parent has children - use last one as previous
+        // if parent has children - use last one as previous
+        previous_id: parentNodeChildren.length ? parentNodeChildren[parentNodeChildren.length - 1].id : null
       }));
       if (nextNode) {
         // update next node in order not to lose link on previous
@@ -290,7 +298,10 @@ export class Node extends Component {
                       trigger={<Icon customClass={styles.icon} icon={ellipsis} />}
                       options={[
                         {
-                          icon: 'add', text: 'Add node after', callback: () => this.addNewNode(), combination: '↵'
+                          icon: 'add',
+                          text: 'Add node after',
+                          callback: () => this.addNewNode(),
+                          combination: '↵'
                         },
                         {
                           icon: 'caret-forward',
@@ -320,7 +331,10 @@ export class Node extends Component {
                           combination: '⇧↓'
                         },
                         {
-                          icon: 'trash', text: 'Delete', type: 'red', callback: () => this.deleteThisNode()
+                          icon: 'trash',
+                          text: 'Delete',
+                          type: 'red',
+                          callback: () => this.deleteThisNode()
                         }
                       ]}
                     />
