@@ -33,10 +33,16 @@ export function fetchList(id) {
  * Add new node with temp_id -> send request to server -> get the id and update the node
  * @param {Object} newData
  */
-export function addEmptyNode(tempId, newData) {
-  return {
-    type: ADD_NEW_NODE,
-    payload: { id: tempId, temp: true, ...newData }
+export function addEmptyNode(newData) {
+  return async (dispatch) => {
+    const result = await requestEndpoint('/api/node', { method: 'POST', body: JSON.stringify(newData) });
+    if (result.error) {
+      return Promise.resolve(dispatch(showError(result.error)));
+    }
+    return Promise.resolve(dispatch({
+      type: ADD_NEW_NODE,
+      payload: result.data
+    }));
   };
 }
 
@@ -58,7 +64,10 @@ export function toggleNodeChilden(id) {
  */
 export function addNode(tempId, newData) {
   return async (dispatch) => {
-    dispatch(addEmptyNode(tempId, newData));
+    dispatch({
+      type: ADD_NEW_NODE,
+      payload: { id: tempId, temp: true, ...newData }
+    });
     const result = await requestEndpoint('/api/node', { method: 'POST', body: JSON.stringify(newData) });
     if (result.error) {
       return Promise.resolve(dispatch(showError(result.error)));

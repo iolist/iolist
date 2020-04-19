@@ -38,7 +38,10 @@ export class Node extends Component {
 
   componentDidMount() {
     const { node } = this.props;
-    this.setState({ title: node.title });
+    this.setState({ title: node.title }, () => {
+      this.calculateSizeOfTextarea();
+    });
+    window.addEventListener('resize', this.calculateSizeOfTextarea);
   }
 
   componentDidUpdate(prevProps) {
@@ -51,6 +54,17 @@ export class Node extends Component {
     if (node.title !== prevNode.title && node.title !== title) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ title: node.title }); // update title if it comes from store
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.calculateSizeOfTextarea);
+  }
+
+  calculateSizeOfTextarea = () => {
+    if (this.textarea.current) {
+      this.textarea.current.style.height = 'auto';
+      this.textarea.current.style.height = `${this.textarea.current.scrollHeight}px`;
     }
   }
 
@@ -81,18 +95,30 @@ export class Node extends Component {
   handleKeydown = async (e) => {
     const { node, allNodes, dispatch } = this.props;
     const { title } = this.state;
-    console.log(e.key, e.shiftKey);
     switch (e.key) {
-      case 'ArrowLeft':
       case 'ArrowUp':
+        if (e.shiftKey) {
+          this.moveUp();
+        } else if (isCaretPositionAt(e.target, 0)) {
+          e.preventDefault();
+          setCaretPositionToEnd(this.getPreviousNode());
+        }
+        break;
+      case 'ArrowLeft':
         if (isCaretPositionAt(e.target, 0)) {
           e.preventDefault();
           setCaretPositionToEnd(this.getPreviousNode());
         }
         break;
-
-      case 'ArrowRight':
       case 'ArrowDown':
+        if (e.shiftKey) {
+          this.moveDown();
+        } else if (isCaretPositionAt(e.target, title.length)) {
+          e.preventDefault();
+          setCaretPositionToBegin(this.getNextNode());
+        }
+        break;
+      case 'ArrowRight':
         if (isCaretPositionAt(e.target, title.length)) {
           e.preventDefault();
           setCaretPositionToBegin(this.getNextNode());
@@ -133,7 +159,6 @@ export class Node extends Component {
         }
         break;
       }
-
 
       default:
         return;
@@ -212,16 +237,40 @@ export class Node extends Component {
     }
   }
 
-  toggleChilden = () => {
-    const { dispatch, node } = this.props;
-    dispatch(toggleNodeChilden(node.id));
+  moveUp = async () => {
+    const { dispatch, node, allNodes } = this.props;
+    if (node.previous_id) {
+      const previousNode = allNodes.find(n => n.id === node.previous_id);
+      const nextNode = allNodes.find(n => n.previous_id === node.id);
+
+      const prevNodePrevId = previousNode.previous_id;
+
+      dispatch(updateNode(node.id, { previous_id: prevNodePrevId }));
+      dispatch(updateNode(previousNode.id, { previous_id: node.id }));
+      if (nextNode) {
+        dispatch(updateNode(nextNode.id, { previous_id: previousNode.id }));
+      }
+    }
   }
 
-  calculateSizeOfTextarea = () => {
-    if (this.textarea.current) {
-      this.textarea.current.style.height = 'auto';
-      this.textarea.current.style.height = `${this.textarea.current.scrollHeight}px`;
+  moveDown = async () => {
+    const { dispatch, node, allNodes } = this.props;
+    const nextNode = allNodes.find(n => n.previous_id === node.id);
+    if (nextNode) {
+      const nextAfterNextNode = allNodes.find(n => n.previous_id === nextNode.id);
+      const nodePrevId = node.previous_id;
+
+      dispatch(updateNode(nextNode.id, { previous_id: nodePrevId }));
+      dispatch(updateNode(node.id, { previous_id: nextNode.id }));
+      if (nextAfterNextNode) {
+        dispatch(updateNode(nextAfterNextNode.id, { previous_id: node.id }));
+      }
     }
+  }
+
+  toggleChilden = () => {
+    const { dispatch, node } = this.props;
+    dispatch(toggleNodeChilden(node.id)); // collapsed is stored in localStore
   }
 
   render() {
@@ -240,10 +289,39 @@ export class Node extends Component {
                     <Dropdown
                       trigger={<Icon customClass={styles.icon} icon={ellipsis} />}
                       options={[
-                        { text: 'Delete', callback: () => this.deleteThisNode() },
-                        { text: 'Add node', callback: () => this.addNewNode() },
-                        { text: 'Indent', callback: () => this.indentNode() },
-                        { text: 'UnIndent', callback: () => this.unIndentNode() }
+                        {
+                          icon: 'add', text: 'Add node after', callback: () => this.addNewNode(), combination: '↵'
+                        },
+                        {
+                          icon: 'caret-forward',
+                          text: 'Indent',
+                          disabled: !node.previous_id,
+                          callback: () => this.indentNode(),
+                          combination: 'Tab'
+                        },
+                        {
+                          icon: 'caret-back',
+                          text: 'Indent back',
+                          disabled: !node.parent_id,
+                          callback: () => this.unIndentNode(),
+                          combination: '⇧Tab'
+                        },
+                        {
+                          icon: 'chevron-up',
+                          text: 'Move up',
+                          disabled: !node.previous_id,
+                          callback: () => this.moveUp(),
+                          combination: '⇧↑'
+                        },
+                        {
+                          icon: 'chevron-down',
+                          text: 'Move down',
+                          callback: () => this.moveDown(),
+                          combination: '⇧↓'
+                        },
+                        {
+                          icon: 'trash', text: 'Delete', type: 'red', callback: () => this.deleteThisNode()
+                        }
                       ]}
                     />
                   )
@@ -263,7 +341,6 @@ export class Node extends Component {
                 )}
               </div>
             </div>
-
             <textarea
               className={styles.title}
               ref={this.textarea}
