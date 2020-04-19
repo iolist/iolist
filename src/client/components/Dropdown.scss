@@ -13,6 +13,7 @@
   background: $white-bg;
   box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.25);
   border-radius: 5px;
+  padding: 5px 0;
   z-index: 1000;
 }
 
@@ -22,12 +23,43 @@
   &.divider {
     border-bottom: 1px solid $border-light;
   }
+  &.disabledItem {
+    opacity: 0.2;
+  }
   .dropdownLink {
-    padding:  10px 15px;
-    display: block;
+    padding:  10px 20px 10px 15px;
+    display: flex;
     cursor: pointer;
+    white-space: nowrap;
     &:hover, &:focus {
       background: $body-bg;
+    }
+
+    &.red {
+      color: $error-color;
+      .dropdownIcon {
+        :global(svg) {
+          fill: $error-color;
+        }
+      }
+    }
+
+    .dropdownIcon {
+      height: 16px;
+      display: inline-block;
+      margin-right: 10px;
+      opacity: 0.5;
+    }
+    .dropdownText {
+      height: 18px;
+      line-height: 20px;
+      display: inline-block;
+      flex-grow: 1;
+    }
+    .dropdownCombination {
+      padding-left: 15px;
+      line-height: 20px;
+      opacity: 0.3;
     }
   }
 }

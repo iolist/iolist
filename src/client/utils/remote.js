@@ -13,10 +13,10 @@ export default async function requestEndpoint(endpoint, options = {}) {
     });
     const data = await response.json();
     if (response.ok) {
-      return { data };
+      return Promise.resolve({ data });
     }
-    return { error: { ...data, response } };
+    return Promise.resolve({ error: { ...data, response } });
   } catch (e) {
-    return { error: e };
+    return Promise.resolve({ error: e });
   }
 }

@@ -25,7 +25,8 @@ export function sortTree(tree) {
     map.delete(lastId); // pop previous
     lastId = element.id;
   }
-  [...map.values(), ...lost].forEach(lostVal => sortedArray.push(lostVal)); // push lost values to an array
+  const elementsOutOfSort = [...map.values()].map(el => ({ ...el, lost: true }));
+  [...elementsOutOfSort, ...lost].forEach(lostVal => sortedArray.push(lostVal)); // push lost values to an array
   return sortedArray;
 }
 
@@ -36,11 +37,6 @@ export function sortTree(tree) {
  * @returns {Array}
  */
 export function getChildNodes(nodes, parentId = null) {
-  const children = nodes.reduce((result, node) => {
-    if (node.parent_id === parentId) {
-      result.push(node);
-    }
-    return result;
-  }, []);
+  const children = nodes.filter(node => (node.parent_id === parentId));
   return sortTree(children);
 }
